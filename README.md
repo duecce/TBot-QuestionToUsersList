@@ -17,5 +17,5 @@ In the end:
 - Rubrica.txt have to be written by user
 - Data.txt will be written by software
 
-#### This image should to clear all your doubts (MSPaint <3)
+#### This image should clear all your doubts (MSPaint <3)
 ![Bot communication scheme](/imgs/scheme.png)
