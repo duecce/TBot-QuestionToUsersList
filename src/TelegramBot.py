@@ -4,6 +4,8 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from TBContactHandler import RubricaHandler, UserDataHandler
 import datetime, copy
 
+from TOKEN import BOT_TOKEN
+
 # to init a new user is necessary to check the mobile number
 # user is allow to interact with bot only if its mobile number will be recognized
 def start(update, context):
@@ -12,7 +14,6 @@ def start(update, context):
         context.user_data['state'] = 'GET_PHONE_NUMBER'
 
 def messageHandler(update, context):
-    user = update.message.from_user
     if context.user_data['state'] == 'GET_PHONE_NUMBER':
         # check if phone number is in rubrica
         contact = list(filter(lambda _contact: _contact['phone_number'] == update.message.text, context.bot_data['contactList']))
@@ -34,6 +35,7 @@ def messageHandler(update, context):
                 print ( '- Rubrica: contact already registered')
         else:
             print ( '- Rubrica: contact number not found' )
+            context.bot.send_message ( chat_id=update.effective_chat.id, text='Phone number not found' )
         context.user_data['state'] = 'IN_GAME'
 
 # send question to all contact registered
@@ -66,14 +68,17 @@ def main():
     rubrica = RubricaHandler()
     broadcastList = UserDataHandler()
     contactList = rubrica.readContactList()
-    broadcastList = broadcastList.readBroadcastList ( );
+    broadcastList = broadcastList.readBroadcastList ( )
+    if ( broadcastList == -1 ):
+        print ( "broadcastList.readBroadcastList() error")
+        exit(0)
     # Step 2: create bot
-    updater = Updater ( token=PUT_HERE_YOUR_BOT_TOKEN, use_context=True)
+    updater = Updater ( token=BOT_TOKEN, use_context=True)
     dp = updater.dispatcher
     dp.add_handler(CommandHandler('start', start)) # command recv: /start 
     dp.add_handler(MessageHandler(Filters.text & (~Filters.command), messageHandler))
     dp.add_handler(CallbackQueryHandler(button_selected))
-    job_daily_question = updater.job_queue.run_daily(dailyQuestion, datetime.time(hour=18-2, minute=24), days=(0,1,2,3,4,5,6)) # UCT Time is (Rome time - 2h)
+    updater.job_queue.run_daily(dailyQuestion, datetime.time(hour=18-2, minute=24), days=(0,1,2,3,4,5,6)) # UCT Time is (Rome time - 2h)
     if len(broadcastList) > 0:
         dp.bot_data['broadcastList'] = broadcastList
         print ( '- Broadcast list: ' + str(len(broadcastList)) + ' users to contact' )

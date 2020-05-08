@@ -1,5 +1,5 @@
 class RubricaHandler:
-    def __init__ ( self, filename='/Rubrica.txt' ):
+    def __init__ ( self, filename='Rubrica.txt' ):
         self.filename = filename
     def updateContact ( self, _contact, registered='1' ):
         contactList = []
@@ -10,14 +10,14 @@ class RubricaHandler:
         file = open(self.filename, 'w')
         for item in contactList:
             file.write(item['phone_number'] + ',' + item['name'] + ',' + item['registered'] + '\n')
-        file.close ( );
+        file.close ( )
     # first step: read the list of contact that are allow to interact with bot
     # file scheme: phone_number, name surname, registered
     def readContactList ( self, only_not_recorded=True ):
         try:
             file = open ( self.filename, 'r' )
-        except ( ValueError ):
-            print ( "Exception: " + ValueError )
+        except ( FileNotFoundError ):
+            print ( "Exception: " + self.filename + " file not found." )
             return -1
         _contactList = []
         for line in file:
@@ -33,14 +33,14 @@ class RubricaHandler:
         return _contactList
 
 class UserDataHandler:
-    def __init__ ( self, filename='/data.txt' ):
+    def __init__ ( self, filename='data.txt' ):
         self.filename = filename
     # this function read the list of contact that are need to be questioned
     def readBroadcastList ( self ):
         try:
-            file = open( self.filename, 'r+' )
-        except ( ValueError ):
-            print ( "Exception: " + ValueError )
+            file = open ( self.filename, 'a+' )
+        except ( FileNotFoundError ):
+            print ( "Exception: " + self.filename + " file not found." )
             return -1
         broadcastList = []
         for line in file:
